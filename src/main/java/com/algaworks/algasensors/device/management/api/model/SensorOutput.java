@@ -6,11 +6,12 @@ import lombok.Data;
 @Data
 @Builder
 public class SensorOutput {
-    private String id;
-    private String name;
-    private String ip;
-    private String location;
-    private String protocol;
-    private String model;
-    private Boolean enabled;
+
+  private String id;
+  private String name;
+  private String ip;
+  private String location;
+  private String protocol;
+  private String model;
+  private Boolean enabled;
 }

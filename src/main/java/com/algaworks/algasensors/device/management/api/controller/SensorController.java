@@ -14,9 +14,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/sensors")
@@ -24,75 +32,75 @@ import org.springframework.validation.annotation.Validated;
 @Validated
 public class SensorController {
 
-    private final SensorRepository sensorRepository;
+  private final SensorRepository sensorRepository;
 
-    @GetMapping
-    public Page<SensorOutput> search(@PageableDefault Pageable pageable) {
-        Page<Sensor> sensors = sensorRepository.findAll(pageable);
-        Page<SensorOutput> map = sensors.map(this::convertToModel);
-        return map;
-    }
+  @GetMapping
+  public Page<SensorOutput> search(@PageableDefault Pageable pageable) {
+    Page<Sensor> sensors = sensorRepository.findAll(pageable);
+    Page<SensorOutput> map = sensors.map(this::convertToModel);
+    return map;
+  }
 
-    @GetMapping("{sensorId}")
-    public SensorOutput getOne(@PathVariable @NotNull TSID sensorId) {
-        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
-        return convertToModel(sensor);
-    }
+  @GetMapping("{sensorId}")
+  public SensorOutput getOne(@PathVariable @NotNull TSID sensorId) {
+    Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    return convertToModel(sensor);
+  }
 
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public SensorOutput create(@RequestBody @Valid SensorInput input) {
-        Sensor sensor = Sensor.builder()
-                .id(new SensorId(IdGenerator.generateTSID()))
-                .name(input.getName())
-                .ip(input.getIp())
-                .location(input.getLocation())
-                .protocol(input.getProtocol())
-                .model(input.getModel())
-                .enabled(false)
-                .build();
+  @PostMapping
+  @ResponseStatus(HttpStatus.CREATED)
+  public SensorOutput create(@RequestBody @Valid SensorInput input) {
+    Sensor sensor = Sensor.builder()
+        .id(new SensorId(IdGenerator.generateTSID()))
+        .name(input.getName())
+        .ip(input.getIp())
+        .location(input.getLocation())
+        .protocol(input.getProtocol())
+        .model(input.getModel())
+        .enabled(false)
+        .build();
 
-        sensor = sensorRepository.saveAndFlush(sensor);
+    sensor = sensorRepository.saveAndFlush(sensor);
 
-        return convertToModel(sensor);
-    }
+    return convertToModel(sensor);
+  }
 
-    @PutMapping("{sensorId}")
-    public SensorOutput update(@PathVariable @NotNull TSID sensorId, @RequestBody @Valid SensorInput input) {
-        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+  @PutMapping("{sensorId}")
+  public SensorOutput update(@PathVariable @NotNull TSID sensorId, @RequestBody @Valid SensorInput input) {
+    Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        sensor.setName(input.getName());
-        sensor.setIp(input.getIp());
-        sensor.setLocation(input.getLocation());
-        sensor.setProtocol(input.getProtocol());
-        sensor.setModel(input.getModel());
+    sensor.setName(input.getName());
+    sensor.setIp(input.getIp());
+    sensor.setLocation(input.getLocation());
+    sensor.setProtocol(input.getProtocol());
+    sensor.setModel(input.getModel());
 
-        sensor = sensorRepository.saveAndFlush(sensor);
+    sensor = sensorRepository.saveAndFlush(sensor);
 
-        return convertToModel(sensor);
-    }
+    return convertToModel(sensor);
+  }
 
-    @DeleteMapping("{sensorId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable @NotNull TSID sensorId) {
-        Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+  @DeleteMapping("{sensorId}")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void delete(@PathVariable @NotNull TSID sensorId) {
+    Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
 
-        sensorRepository.delete(sensor);
-    }
+    sensorRepository.delete(sensor);
+  }
 
-    private SensorOutput convertToModel(Sensor sensor) {
-        return SensorOutput.builder()
-                .id(sensor.getId().toString())
-                .name(sensor.getName())
-                .ip(sensor.getIp())
-                .location(sensor.getLocation())
-                .protocol(sensor.getProtocol())
-                .model(sensor.getModel())
-                .enabled(sensor.getEnabled())
-                .build();
-    }
+  private SensorOutput convertToModel(Sensor sensor) {
+    return SensorOutput.builder()
+        .id(sensor.getId().toString())
+        .name(sensor.getName())
+        .ip(sensor.getIp())
+        .location(sensor.getLocation())
+        .protocol(sensor.getProtocol())
+        .model(sensor.getModel())
+        .enabled(sensor.getEnabled())
+        .build();
+  }
 
 }

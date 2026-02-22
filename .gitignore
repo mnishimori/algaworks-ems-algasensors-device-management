@@ -31,3 +31,5 @@ build/
 *.run.xml
 .idea/
 *.iml
+
+.ai-templates/

@@ -14,25 +14,25 @@ import java.util.Objects;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SensorId implements Serializable {
 
-    private TSID value;
+  private TSID value;
 
-    public SensorId(TSID value) {
-        Objects.requireNonNull(value);
-        this.value = value;
-    }
+  public SensorId(TSID value) {
+    Objects.requireNonNull(value);
+    this.value = value;
+  }
 
-    public SensorId(Long value) {
-        Objects.requireNonNull(value);
-        this.value = TSID.from(value);
-    }
+  public SensorId(Long value) {
+    Objects.requireNonNull(value);
+    this.value = TSID.from(value);
+  }
 
-    public SensorId(String value) {
-        Objects.requireNonNull(value);
-        this.value = TSID.from(value);
-    }
+  public SensorId(String value) {
+    Objects.requireNonNull(value);
+    this.value = TSID.from(value);
+  }
 
-    @Override
-    public String toString() {
-        return value.toString();
-    }
+  @Override
+  public String toString() {
+    return value.toString();
+  }
 }

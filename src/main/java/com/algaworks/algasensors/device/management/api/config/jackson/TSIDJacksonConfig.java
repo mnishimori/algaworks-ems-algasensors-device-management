@@ -9,11 +9,11 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 public class TSIDJacksonConfig {
 
-    @Bean
-    public Module tsidModule() {
-        SimpleModule module = new SimpleModule();
-        module.addSerializer(TSID.class, new TSIDToStringSerializer());
-        return module;
-    }
+  @Bean
+  public Module tsidModule() {
+    SimpleModule module = new SimpleModule();
+    module.addSerializer(TSID.class, new TSIDToStringSerializer());
+    return module;
+  }
 
 }
