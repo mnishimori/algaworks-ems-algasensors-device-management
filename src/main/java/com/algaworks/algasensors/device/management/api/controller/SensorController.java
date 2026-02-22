@@ -43,8 +43,7 @@ public class SensorController {
 
   @GetMapping("{sensorId}")
   public SensorOutput getOne(@PathVariable @NotNull TSID sensorId) {
-    Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    Sensor sensor = findSensorById(sensorId);
     return convertToModel(sensor);
   }
 
@@ -68,8 +67,7 @@ public class SensorController {
 
   @PutMapping("{sensorId}")
   public SensorOutput update(@PathVariable @NotNull TSID sensorId, @RequestBody @Valid SensorInput input) {
-    Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    Sensor sensor = findSensorById(sensorId);
 
     sensor.setName(input.getName());
     sensor.setIp(input.getIp());
@@ -85,10 +83,30 @@ public class SensorController {
   @DeleteMapping("{sensorId}")
   @ResponseStatus(HttpStatus.NO_CONTENT)
   public void delete(@PathVariable @NotNull TSID sensorId) {
-    Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
-        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+    Sensor sensor = findSensorById(sensorId);
 
     sensorRepository.delete(sensor);
+  }
+
+  @PutMapping("{sensorId}/enable")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void enable(@PathVariable @NotNull TSID sensorId) {
+    Sensor sensor = findSensorById(sensorId);
+    sensor.setEnabled(true);
+    sensorRepository.saveAndFlush(sensor);
+  }
+
+  @DeleteMapping("{sensorId}/enable")
+  @ResponseStatus(HttpStatus.NO_CONTENT)
+  public void disable(@PathVariable @NotNull TSID sensorId) {
+    Sensor sensor = findSensorById(sensorId);
+    sensor.setEnabled(false);
+    sensorRepository.saveAndFlush(sensor);
+  }
+
+  private Sensor findSensorById(TSID sensorId) {
+    return sensorRepository.findById(new SensorId(sensorId))
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
   }
 
   private SensorOutput convertToModel(Sensor sensor) {
