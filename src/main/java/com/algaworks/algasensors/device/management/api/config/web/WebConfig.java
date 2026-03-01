@@ -1,7 +1,9 @@
 package com.algaworks.algasensors.device.management.api.config.web;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.format.FormatterRegistry;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
@@ -10,5 +12,10 @@ public class WebConfig implements WebMvcConfigurer {
   @Override
   public void addFormatters(FormatterRegistry registry) {
     registry.addConverter(new StringToTSIDWebConverter());
+  }
+
+  @Bean
+  public RestClient.Builder restClientBuilder() {
+    return RestClient.builder();
   }
 }

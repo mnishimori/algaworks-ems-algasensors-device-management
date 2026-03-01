@@ -1,5 +1,6 @@
 package com.algaworks.algasensors.device.management.api.controller;
 
+import com.algaworks.algasensors.device.management.api.client.SensorMonitoringClient;
 import com.algaworks.algasensors.device.management.api.model.SensorInput;
 import com.algaworks.algasensors.device.management.api.model.SensorOutput;
 import com.algaworks.algasensors.device.management.common.IdGenerator;
@@ -9,7 +10,6 @@ import com.algaworks.algasensors.device.management.domain.repository.SensorRepos
 import io.hypersistence.tsid.TSID;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
-import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -28,11 +28,16 @@ import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 @RequestMapping("/api/sensors")
-@RequiredArgsConstructor
 @Validated
 public class SensorController {
 
   private final SensorRepository sensorRepository;
+  private final SensorMonitoringClient sensorMonitoringClient;
+
+  public SensorController(SensorRepository sensorRepository, SensorMonitoringClient sensorMonitoringClient) {
+    this.sensorRepository = sensorRepository;
+    this.sensorMonitoringClient = sensorMonitoringClient;
+  }
 
   @GetMapping
   public Page<SensorOutput> search(@PageableDefault Pageable pageable) {
@@ -94,6 +99,7 @@ public class SensorController {
     Sensor sensor = findSensorById(sensorId);
     sensor.setEnabled(true);
     sensorRepository.saveAndFlush(sensor);
+    sensorMonitoringClient.enableMonitoring(sensorId);
   }
 
   @DeleteMapping("{sensorId}/enable")
@@ -102,6 +108,7 @@ public class SensorController {
     Sensor sensor = findSensorById(sensorId);
     sensor.setEnabled(false);
     sensorRepository.saveAndFlush(sensor);
+    sensorMonitoringClient.disableMonitoring(sensorId);
   }
 
   private Sensor findSensorById(TSID sensorId) {
@@ -120,5 +127,4 @@ public class SensorController {
         .enabled(sensor.getEnabled())
         .build();
   }
-
 }
