@@ -1,7 +1,9 @@
 package com.algaworks.algasensors.device.management.api.controller;
 
 import com.algaworks.algasensors.device.management.api.client.SensorMonitoringClient;
+import com.algaworks.algasensors.device.management.api.model.SensorDetailOutput;
 import com.algaworks.algasensors.device.management.api.model.SensorInput;
+import com.algaworks.algasensors.device.management.api.model.SensorMonitoringOutput;
 import com.algaworks.algasensors.device.management.api.model.SensorOutput;
 import com.algaworks.algasensors.device.management.common.IdGenerator;
 import com.algaworks.algasensors.device.management.domain.model.Sensor;
@@ -42,8 +44,7 @@ public class SensorController {
   @GetMapping
   public Page<SensorOutput> search(@PageableDefault Pageable pageable) {
     Page<Sensor> sensors = sensorRepository.findAll(pageable);
-    Page<SensorOutput> map = sensors.map(this::convertToModel);
-    return map;
+    return sensors.map(this::convertToModel);
   }
 
   @GetMapping("{sensorId}")
@@ -51,6 +52,21 @@ public class SensorController {
     Sensor sensor = findSensorById(sensorId);
     return convertToModel(sensor);
   }
+
+  @GetMapping("{sensorId}/detail")
+  public SensorDetailOutput getOneWithDetail(@PathVariable TSID sensorId) {
+    Sensor sensor = sensorRepository.findById(new SensorId(sensorId))
+        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND));
+
+    SensorMonitoringOutput monitoringOuput = sensorMonitoringClient.getMonitoring(sensorId);
+    SensorOutput sensorOutput = convertToModel(sensor);
+
+    return SensorDetailOutput.builder()
+        .monitoring(monitoringOuput)
+        .sensor(sensorOutput)
+        .build();
+  }
+
 
   @PostMapping
   @ResponseStatus(HttpStatus.CREATED)
